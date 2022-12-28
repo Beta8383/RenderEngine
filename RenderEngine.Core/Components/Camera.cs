@@ -10,8 +10,8 @@ namespace RenderEngine.Core.Components
 
     public struct Camera
     {
-        public Vector4 Position, Up, Direction;
-        public float Right, Left, Top, Bottom, Far, Near;
+        public Vector3 Position, Up, Direction;
+        public float zNearPlane, zFarPlane, width, height;
         public ProjectionMode Mode;
     }
 }

@@ -27,6 +27,14 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
 	  <CreatePackage>false</CreatePackage>
 	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <LangVersion>11.0</LangVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <LangVersion>11.0</LangVersion>
+	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -52,5 +60,18 @@
 	  <None Remove="SkiaSharp.Views.Maui.Controls" />
 	  <None Remove="Microsoft.Maui.Graphics.Skia" />
 	  <None Remove="SkiaSharp.NativeAssets.macOS" />
+	  <None Remove="Resources\Shader\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\RenderEngine.Core\RenderEngine.Core.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Resources\Shader\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Resources\Shader\SolidColorVertexShader.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <BundleResource Include="Resources\Shader\SolidColorVertexShader.cs" />
 	</ItemGroup>
 </Project>

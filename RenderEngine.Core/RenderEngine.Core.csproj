@@ -9,9 +9,13 @@
   <ItemGroup>
     <None Remove="Components\" />
     <None Remove="Shader\" />
+    <None Remove="Shader\VertexShader\" />
+    <None Remove="Shader\FragmentShader\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Components\" />
     <Folder Include="Shader\" />
+    <Folder Include="Shader\VertexShader\" />
+    <Folder Include="Shader\FragmentShader\" />
   </ItemGroup>
 </Project>
