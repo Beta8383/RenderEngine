@@ -5,13 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Components\" />
-    <None Remove="Shader\" />
-    <None Remove="Shader\VertexShader\" />
-    <None Remove="Shader\FragmentShader\" />
-  </ItemGroup>
+  
   <ItemGroup>
     <Folder Include="Components\" />
     <Folder Include="Shader\" />

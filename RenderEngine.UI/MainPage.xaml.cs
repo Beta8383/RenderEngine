@@ -11,10 +11,11 @@ public partial class MainPage : ContentPage
 	}
 
     int times = 0;
+    bool update=false;
 
     unsafe void Canvas_PaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
-
+        if (!update) return;
         SKPixmap pixmap = e.Surface.PeekPixels();
         
         pixmap.Erase(new SKColor(0, 0, 0));
@@ -29,13 +30,14 @@ public partial class MainPage : ContentPage
                 a[i * width * pixmap.BytesPerPixel + j * pixmap.BytesPerPixel + 1] = 255;
                 a[i * width * pixmap.BytesPerPixel + j * pixmap.BytesPerPixel + 2] = 255;
             }
-        Message.Text = "Width:" + width + "Height:" + height +"BytesPerPixel:" + pixmap.BytesPerPixel;
+        Message.Text = times + "Width:" + width + "Height:" + height +"BytesPerPixel:" + pixmap.BytesPerPixel;
         times++;
+        update = false;
     }
 
     void Button_Clicked(System.Object sender, System.EventArgs e)
     {
-        
+        update = true;
         Canvas.InvalidateSurface();
     }
 }

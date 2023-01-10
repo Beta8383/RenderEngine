@@ -97,9 +97,9 @@ public class Engine
         for (int x = minx; x <= maxx; x++)
             for (int y = miny; y <= maxy; y++)
             {
-                if (GetBarycentricCoordinate(p1, p2, p3, (float)(x + 0.5), (float)(y + 0.5), out i, out j, out k))
+                if (GetBarycentricCoordinate(vertices[0], vertices[1], vertices[2], (float)(x + 0.5), (float)(y + 0.5), out i, out j, out k))
                 {
-                    depth = p1.Z * i + p2.Z * j + p3.Z * k;
+                    depth = vertices[0].Z * i + vertices[1].Z * j + vertices[2].Z * k;
                     if (depth <= 0 && depth > zBuffer[y,x])
                     {
                         zBuffer[y, x] = depth;
@@ -109,13 +109,13 @@ public class Engine
             }
     }
 
-    private Vector4[] ApplyVertexShader(ShapeBase shape,out Vector4[][] para)
+    private Vector4[] ApplyVertexShader(ShapeBase shape,out Vector4[][] para,IVertexShader shader)
     {
         int verticesCount = shape.Vertices.Length;
         var vertices = new Vector4[verticesCount];
         para = new Vector4[verticesCount][];
         for (int i = 0; i < verticesCount; i++)
-            shape.VectexShader.main(shape.Vertices[i], shape.ModelTransform, transform, out para[i]);
+            shader.main(shape.Vertices[i], shape.ModelTransform, transform, out para[i]);
         return vertices;
     }
 

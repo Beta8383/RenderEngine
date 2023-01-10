@@ -54,17 +54,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.3" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="SkiaSharp" />
-	  <None Remove="SkiaSharp.Views.Maui.Controls" />
-	  <None Remove="Microsoft.Maui.Graphics.Skia" />
-	  <None Remove="SkiaSharp.NativeAssets.macOS" />
-	  <None Remove="Resources\Shader\" />
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\RenderEngine.Core\RenderEngine.Core.csproj" />
-	</ItemGroup>
+	
 	<ItemGroup>
 	  <Folder Include="Resources\Shader\" />
 	</ItemGroup>
