@@ -2,25 +2,26 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build core",
+            "label": "build",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/RenderEngine.Core/RenderEngine.Core.csproj",
+                "${workspaceFolder}/RenderEngine.Test/RenderEngine.Test.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "build UI",
+            "label": "publish",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "build",
-                "${workspaceFolder}/RenderEngine.UI/RenderEngine.UI.csproj",
-                "-f:net7.0-maccatalyst",
+                "publish",
+                "${workspaceFolder}/RenderEngine.Test/RenderEngine.Test.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -32,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/RenderEngine.UI/RenderEngine.UI.csproj"
+                "${workspaceFolder}/RenderEngine.Test/RenderEngine.Test.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

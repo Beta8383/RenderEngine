@@ -1,10 +1,6 @@
-﻿using System;
-using System.Drawing;
-using System.Numerics;
-using System.Security.Principal;
+﻿using System.Numerics;
 using RenderEngine.Core.Components;
-using RenderEngine.Core.Components.Shape;
-using RenderEngine.Core.Shader;
+using RenderEngine.Core.Components.Models;
 using static System.MathF;
 
 namespace RenderEngine.Core;
@@ -17,20 +13,17 @@ public class Engine
     private readonly uint width, height;
     private float[,] zBuffer;
 
-    List<ShapeBase> shapes;
+    List<ModelBase> models = new();
 
     Matrix4x4 viewportTransform = Matrix4x4.Identity,
-              transform = Matrix4x4.Identity;
+              cameraTransform = Matrix4x4.Identity,
+              projectionTransform = Matrix4x4.Identity;
 
     public Engine(uint height, uint width)
     {
         this.width = width;
         this.height = height;
-        Init();
-    }
 
-    public void Init()
-    {
         viewportTransform = new(
             width / 2.0f, 0, 0, -width / 2.0f,
             0, height / 2.0f, 0, -height / 2.0f,
@@ -39,7 +32,6 @@ public class Engine
         );
 
         zBuffer = new float[height, width];
-        shapes = new List<ShapeBase>();
         pixels = new byte[width * height * BytesPerPixel];
     }
 
@@ -58,7 +50,7 @@ public class Engine
         pixels[index + 3] = (byte)LimitNumber(0, 255, color.W);
     }
 
-    private static bool GetBarycentricCoordinate(Vector4 p1, Vector4 p2, Vector4 p3, float x, float y, out float i, out float j, out float k)
+    private static bool GetBarycentricCoordinate(Vector3 p1, Vector3 p2, Vector3 p3, float x, float y, out float i, out float j, out float k)
     {
         float a = p1.Y - p3.Y;
         float b = p1.Y - p3.Y;
@@ -74,22 +66,14 @@ public class Engine
         return i > 0 && j > 0 && k > 0;
     }
 
-    private static Vector4[] GetFragmentShaderParameters(Span<Vector4[]> para,int i,int j,int k,int length)
-    {
-        Vector4[] result = new Vector4[length];
-        for (int l = 0; l < length; l++)
-            result[l] = para[0][l] * i+ para[1][l] * j + para[2][l] * k;
-        return result;
-    }
-
-    private void GetTriangleCoverageMask(ReadOnlySpan<Vector4> vertices)
+    private void RenderTriangle(ReadOnlySpan<Vector3> vertices, Vector4 color)
     {
         int minx = (int)Min3(vertices[0].X, vertices[1].X, vertices[2].X);
         int miny = (int)Min3(vertices[0].Y, vertices[1].Y, vertices[2].Y);
         int maxx = (int)Max3(vertices[0].X, vertices[1].X, vertices[2].X) + 1;
         int maxy = (int)Max3(vertices[0].Y, vertices[1].Y, vertices[2].Y) + 1;
 
-        minx = (int)LimitNumber(0, width - 1,minx);
+        minx = (int)LimitNumber(0, width - 1, minx);
         miny = (int)LimitNumber(0, height - 1, miny);
 
         float i, j, k, depth;
@@ -100,43 +84,29 @@ public class Engine
                 if (GetBarycentricCoordinate(vertices[0], vertices[1], vertices[2], (float)(x + 0.5), (float)(y + 0.5), out i, out j, out k))
                 {
                     depth = vertices[0].Z * i + vertices[1].Z * j + vertices[2].Z * k;
-                    if (depth <= 0 && depth > zBuffer[y,x])
+                    if (depth <= 0 && depth > zBuffer[y, x])
                     {
                         zBuffer[y, x] = depth;
-                        Vector4 fragmentShaderpara = 
+                        SetPixel(color, x, y);
                     }
                 }
             }
     }
 
-    private Vector4[] ApplyVertexShader(ShapeBase shape,out Vector4[][] para,IVertexShader shader)
+    private void RenderModel(ModelBase model)
     {
-        int verticesCount = shape.Vertices.Length;
-        var vertices = new Vector4[verticesCount];
-        para = new Vector4[verticesCount][];
-        for (int i = 0; i < verticesCount; i++)
-            shader.main(shape.Vertices[i], shape.ModelTransform, transform, out para[i]);
-        return vertices;
-    }
+        Matrix4x4 transform = viewportTransform * projectionTransform * cameraTransform * model.ModelsTransform;
 
-    private void RenderShape(ShapeBase shape)
-    {
-        Vector4[][] para;
-        var verticesSpan = new ReadOnlySpan<Vector4>(ApplyVertexShader(shape, out para));
-        var paraSpan = new ReadOnlySpan<Vector4[]>(para);
-
-
-
-        int[] triangleIndex = shape.GetTriangleIndex();
-        for (int i = 0; i < triangleIndex.Length; i++)
-            RenderTriangle(shape, triangleIndex[i]);
+        ReadOnlySpan<Vector3> vertices = new(model.Vertices);
+        foreach (var index in model.TriangleIndex)
+            RenderTriangle(vertices.Slice(index, 3), model.Color);
     }
 
     public ReadOnlySpan<byte> GetFrame()
     {
         Reset();
-        foreach (ShapeBase shape in shapes)
-            RenderShape(shape);
+        foreach (ModelBase model in models)
+            RenderModel(model);
 
         return new ReadOnlySpan<byte>(pixels);
     }
@@ -147,8 +117,8 @@ public class Engine
         zBuffer.SetValue(float.NegativeInfinity, height, width);
     }
 
-    public void AddShape(ShapeBase shape) =>
-        shapes.Add(shape);
+    public void AddModel(ModelBase model) =>
+        models.Add(model);
 
     public void SetCamera(Camera camera)
     {
@@ -177,11 +147,10 @@ public class Engine
             zaxis.X, zaxis.Y, zaxis.Z, 0,
             0, 0, 0, 1);
 
-        Matrix4x4 cameraTransform = translate * rotate;
+        cameraTransform = translate * rotate;
         #endregion
 
         #region Projection transform
-        Matrix4x4 projectionTransform = Matrix4x4.Identity;
         if (camera.Mode == ProjectionMode.Orthographic)
         {
             //projectionTransform = Matrix4x4.CreateOrthographic(camera.width, camera.height, camera.zFarPlane, camera.zFarPlane);
@@ -195,7 +164,5 @@ public class Engine
 
         }
         #endregion
-
-        transform = viewportTransform * projectionTransform * cameraTransform;
     }
 }

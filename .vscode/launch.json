@@ -5,20 +5,22 @@
             // Use IntelliSense to find out which attributes exist for C# debugging
             // Use hover for the description of the existing attributes
             // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": "Launch UI",
+            "name": ".NET Core Launch (console)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build UI",
+            "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/RenderEngine.UI/bin/Debug/net7.0-maccatalyst/maccatalyst-x64/RenderEngine.UI.dll",
-            "args": [
-                "-f:net7.0-maccatalyst",
-                "-c:Debug"
-            ],
-            "cwd": "${workspaceFolder}/RenderEngine.UI",
+            "program": "${workspaceFolder}/RenderEngine.Test/bin/Debug/net7.0/RenderEngine.Test.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/RenderEngine.Test",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false
         },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
     ]
 }
